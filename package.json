@@ -1,0 +1,14 @@
+{
+  "name": "script-runner-horseman",
+  "version": "1.0.0",
+  "description": "Script Runner with HorsemanJs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "charles damasceno",
+  "license": "ISC",
+  "dependencies": {
+    "node-horseman": "^3.3.0"
+  }
+}
