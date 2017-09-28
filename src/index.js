@@ -11,9 +11,9 @@ var options = {
 
 var userAgent = 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)'
 var conta = {
-    ag: '3242',
-    cc: '13452-0',
-    dac: '2'
+    ag: 'xxxx',
+    cc: 'xxxxx-x',
+    dac: 'x'
 }
 var _url = "https://www.itau.com.br/empresas"
 
