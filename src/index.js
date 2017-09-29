@@ -5,7 +5,7 @@ var co = require('co')
 var fs = require('fs')
 
 var options = {
-    loadImages: true,
+    loadImages: false,
     ignoreSSLErrors: true,
     timeout: 3000,
     injectJquery: true,
@@ -25,7 +25,7 @@ var _url = "https://shwt060cto/lgnet/itauf/bankline.htm"
 
 let loginYield2 = co.wrap(function*() {
 
-    for (let i=1; i<8; i++) {
+    for (let i=1; i<10; i++) {
         let file = 'login' + i + '.PNG'
         if (fs.existsSync(file))
             fs.unlink(file)
@@ -33,38 +33,47 @@ let loginYield2 = co.wrap(function*() {
     
     try{
         var horseman = new Horseman(options)
-
-        yield horseman.userAgent(userAgent)
+        .userAgent(userAgent)
         
-        yield horseman.on('resourceError', function(err) {
-            console.log('resourceError ======>', err.message)
+        yield horseman.on('error', function (msg, trace) {
+            console.log(msg, trace);
+        }).on('timeout', function (timeout, msg) {
+            console.log('=> timeout', msg);
+        }).on('resourceTimeout', function (msg) {
+            console.log('=> resourceTimeout', msg);
+
+        }).on('resourceError', function (msg) {
+            console.log('=> resourceError', msg);
+            console.log('=> erro em: ', _step);
+        }).on('loadFinished', function (msg) {
+            console.log('=> loadFinished', msg);
+        }).on('loadStarted', function (msg) {
+            console.log('=> loadStarted', msg);
+        }).on("urlChanged", (newurl)=>{
+            console.log("=> Url alterada para : " + newurl);
         })
 
-        yield horseman.on('timeout', function(err) {
-            console.log('timeout ======>', err.message)
-        })
+        let _step = 'step 1'
 
         yield horseman.open(_url)
-        yield horseman.screenshot('login1.PNG')
-
-        yield horseman.evaluate(function(param) {
+        .screenshot('login1.PNG')
+        .evaluate(function(param) {
             document.querySelector('#agencia').value = param.ag;
             document.querySelector('#conta').value = param.cc;
             document.querySelector('#dac').value = param.dac;
             document.querySelector('input[type="image"]').click()
         }, conta)
+        .waitForNextPage({timeout: 8000})
 
-        yield horseman.wait(5000)
+        _step = 'step 2'
         yield horseman.screenshot('login2.PNG')
-
-        yield horseman.evaluate(function() {
+        .evaluate(function() {
             document.querySelector('#MSGBordaEsq a').click()
         })
         
-        yield horseman.wait(5000)
+        _step = 'step 3'
         yield horseman.screenshot('login3.PNG')
-
-        yield horseman.evaluate(function() {
+        .evaluate(function() {
             document.querySelector('#TecladoFlutuanteBKL form img[title*="1"]').click()
             document.querySelector('#TecladoFlutuanteBKL form img[title*="2"]').click()
             document.querySelector('#TecladoFlutuanteBKL form img[title*="3"]').click()
@@ -75,43 +84,40 @@ let loginYield2 = co.wrap(function*() {
             document.querySelector('#TecladoFlutuanteBKL form img[title*="1"]').click()
             document.querySelector('#idBtnContinuar > img').click()
         })
+        .waitForNextPage()
 
-        yield horseman.wait(7000)
+        _step = 'step 4'
         yield horseman.screenshot('login4.PNG')
-
-        yield horseman.evaluate(function() {
+        .evaluate(function() {
             document.querySelector('input[name="bt_confirmar"]').click()
         })
+        .waitForNextPage({timeout: 25000})
 
-        yield horseman.wait(20000)
-        
-        // yield horseman.waitForNextPage({timeout: 20000})
+        _step = 'step 5'
         yield horseman.screenshot('login5.PNG')
-
-        yield horseman.evaluate(function() {
+        .evaluate(function() {
             document.querySelector('#menulinha1 > a.menusupsel').click()
         })
+        .wait(5000)
 
-        yield horseman.wait(15000)
+        _step = 'step 6'
         yield horseman.screenshot('login6.PNG')
-
-        yield horseman.evaluate(function() {
-            document.querySelector('#TOPbtnsair').click()
+        .evaluate(function() {
+            document.querySelector('div.btnSair a').click()
         })
+        .waitForNextPage({timeout: 10000})
 
-        yield horseman.wait(5000)
+        _step = 'step 7'
         yield horseman.screenshot('login7.PNG')
-
-        yield horseman.evaluate(function() {
+        .evaluate(function() {
             document.querySelector('img[alt=Sair]').click()
         })
+        .waitForNextPage({timeout: 10000})
 
-        yield horseman.wait(5000)
+        _step = 'step 8'
         yield horseman.screenshot('login8.PNG')
-        
 
         return yield horseman.close();
-
     }catch(err){
         horseman.close();
     }
